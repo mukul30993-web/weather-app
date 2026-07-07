@@ -22,165 +22,154 @@
 
 <div class="container">
 
-<div class="weather-card">
+    <div class="weather-card">
 
-    <!-- Heading -->
+        <h1>
+            <i class="fa-solid fa-cloud-sun"></i>
+            Weather Dashboard
+        </h1>
 
-    <h1>
+        <form method="POST" class="search-box">
 
-        <i class="fa-solid fa-cloud-sun"></i>
+            <input
+                type="text"
+                name="city"
+                placeholder="Enter city name..."
+                value="{{ request.form.get('city','') }}"
+                autocomplete="off"
+                required>
 
-        Weather Dashboard
+            <button type="submit">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
 
-    </h1>
+        </form>
 
-    <!-- Search -->
-
-    <form method="POST" class="search-box">
-
-        <input
-            type="text"
-            name="city"
-            placeholder="Enter city name..."
-            required>
-
-        <button type="submit">
-
-            <i class="fa-solid fa-magnifying-glass"></i>
-
-        </button>
-
-    </form>
-
-    {% if error %}
-
+        {% if error %}
         <p class="error">{{ error }}</p>
+        {% endif %}
 
-    {% endif %}
+        {% if weather %}
 
-    {% if weather %}
+        <!-- Top Section -->
 
-    <!-- ================= TOP SECTION ================= -->
+        <div class="top-section">
 
-    <div class="top-section">
+            <div class="left-panel">
 
-        <!-- LEFT -->
+                <div class="weather-main">
 
-        <div class="left-panel">
+                    <div class="weather-icon">
 
-            <div class="weather-main">
+                        <img
+                            src="https://openweathermap.org/img/wn/{{ weather.icon }}@4x.png"
+                            alt="Weather">
 
-                <img
-                src="https://openweathermap.org/img/wn/{{ weather.icon }}@4x.png"
-                alt="Weather">
+                    </div>
 
-                <div class="weather-text">
+                    <div class="weather-text">
 
-                    <h2>{{ weather.temp }}°C</h2>
+                        <h2>{{ weather.temp }}°C</h2>
 
-                    <h3>{{ weather.city }}, {{ weather.country }}</h3>
+                        <h3>{{ weather.city }}, {{ weather.country }}</h3>
 
-                    <p>{{ weather.description }}</p>
+                        <p>{{ weather.description }}</p>
+
+                    </div>
 
                 </div>
 
             </div>
 
-        </div>
+            <div class="right-panel">
 
-        <!-- RIGHT -->
+                <h3>Hourly Temperature</h3>
 
-        <div class="right-panel">
+                <canvas id="tempChart"></canvas>
 
-            <h3>Temperature Overview</h3>
-
-            <canvas id="tempChart"></canvas>
+            </div>
 
         </div>
 
-    </div>
+        <!-- Details -->
 
-    <!-- ================= WEATHER DETAILS ================= -->
+        <div class="details">
 
-    <div class="details">
+            <div class="box">
+                <i class="fa-solid fa-arrow-down"></i>
+                <h4>Min Temp</h4>
+                <p>{{ weather.temp_min }}°C</p>
+            </div>
 
-        <div class="box">
-            <i class="fa-solid fa-arrow-down"></i>
-            <h4>Min Temp</h4>
-            <p>{{ weather.temp_min }}°C</p>
+            <div class="box">
+                <i class="fa-solid fa-arrow-up"></i>
+                <h4>Max Temp</h4>
+                <p>{{ weather.temp_max }}°C</p>
+            </div>
+
+            <div class="box">
+                <i class="fa-solid fa-temperature-half"></i>
+                <h4>Feels Like</h4>
+                <p>{{ weather.feels_like }}°C</p>
+            </div>
+
+            <div class="box">
+                <i class="fa-solid fa-droplet"></i>
+                <h4>Humidity</h4>
+                <p>{{ weather.humidity }}%</p>
+            </div>
+
+            <div class="box">
+                <i class="fa-solid fa-wind"></i>
+                <h4>Wind</h4>
+                <p>{{ weather.wind }} m/s</p>
+            </div>
+
+            <div class="box">
+                <i class="fa-solid fa-eye"></i>
+                <h4>Visibility</h4>
+                <p>{{ weather.visibility }} km</p>
+            </div>
+
+            <div class="box">
+                <i class="fa-solid fa-cloud"></i>
+                <h4>Clouds</h4>
+                <p>{{ weather.clouds }}%</p>
+            </div>
+
+            <div class="box">
+                <i class="fa-solid fa-gauge-high"></i>
+                <h4>Pressure</h4>
+                <p>{{ weather.pressure }} hPa</p>
+            </div>
+
+            <div class="box">
+                <i class="fa-solid fa-sun"></i>
+                <h4>Sunrise</h4>
+                <p>{{ weather.sunrise }}</p>
+            </div>
+
+            <div class="box">
+                <i class="fa-solid fa-moon"></i>
+                <h4>Sunset</h4>
+                <p>{{ weather.sunset }}</p>
+            </div>
+
         </div>
 
-        <div class="box">
-            <i class="fa-solid fa-arrow-up"></i>
-            <h4>Max Temp</h4>
-            <p>{{ weather.temp_max }}°C</p>
-        </div>
+        <!-- Forecast -->
 
-        <div class="box">
-            <i class="fa-solid fa-temperature-half"></i>
-            <h4>Feels Like</h4>
-            <p>{{ weather.feels_like }}°C</p>
-        </div>
+        <div class="forecast">
 
-        <div class="box">
-            <i class="fa-solid fa-droplet"></i>
-            <h4>Humidity</h4>
-            <p>{{ weather.humidity }}%</p>
-        </div>
+            <h2>
 
-        <div class="box">
-            <i class="fa-solid fa-wind"></i>
-            <h4>Wind</h4>
-            <p>{{ weather.wind }} m/s</p>
-        </div>
+                <i class="fa-solid fa-calendar-days"></i>
 
-        <div class="box">
-            <i class="fa-solid fa-eye"></i>
-            <h4>Visibility</h4>
-            <p>{{ weather.visibility }} km</p>
-        </div>
+                5-Day Forecast
 
-        <div class="box">
-            <i class="fa-solid fa-cloud"></i>
-            <h4>Clouds</h4>
-            <p>{{ weather.clouds }}%</p>
-        </div>
+            </h2>
 
-        <div class="box">
-            <i class="fa-solid fa-gauge-high"></i>
-            <h4>Pressure</h4>
-            <p>{{ weather.pressure }} hPa</p>
-        </div>
-
-        <div class="box">
-            <i class="fa-solid fa-sun"></i>
-            <h4>Sunrise</h4>
-            <p>{{ weather.sunrise }}</p>
-        </div>
-
-        <div class="box">
-            <i class="fa-solid fa-moon"></i>
-            <h4>Sunset</h4>
-            <p>{{ weather.sunset }}</p>
-        </div>
-
-    </div>
-
-    <!-- ================= FORECAST ================= -->
-
-    <div class="forecast">
-
-        <h2>
-
-            <i class="fa-solid fa-calendar-days"></i>
-
-            5-Day Forecast
-
-        </h2>
-
-        <div id="forecastCards">
-
-            {% if forecast %}
+            <div id="forecastCards">
 
                 {% for day in forecast %}
 
@@ -189,7 +178,8 @@
                     <h3>{{ day.day }}</h3>
 
                     <img
-                    src="https://openweathermap.org/img/wn/{{ day.icon }}@2x.png">
+                        src="https://openweathermap.org/img/wn/{{ day.icon }}@2x.png"
+                        alt="Forecast">
 
                     <p>{{ day.temp }}°C</p>
 
@@ -199,28 +189,35 @@
 
                 {% endfor %}
 
-            {% else %}
-
-                <div class="forecast-placeholder">
-
-                    Search a city to see the forecast.
-
-                </div>
-
-            {% endif %}
+            </div>
 
         </div>
 
+        {% endif %}
+
     </div>
 
-    {% endif %}
-
 </div>
 
-</div>
+{% if hourly %}
+<script>
+
+const hourlyLabels = [
+{% for item in hourly %}
+"{{ item.time }}",
+{% endfor %}
+];
+
+const hourlyTemps = [
+{% for item in hourly %}
+{{ item.temp }},
+{% endfor %}
+];
+
+</script>
+{% endif %}
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>
-
 </html>

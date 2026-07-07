@@ -15,6 +15,7 @@ def home():
 
     weather = None
     forecast = []
+    hourly = []
     error = None
 
     if request.method == "POST":
@@ -23,110 +24,137 @@ def home():
 
         if city:
 
+            params = {
+                "q": city,
+                "appid": API_KEY,
+                "units": "metric"
+            }
+
             try:
 
-                params = {
-                    "q": city,
-                    "appid": API_KEY,
-                    "units": "metric"
+                # Current Weather
+                current = requests.get(
+                    CURRENT_URL,
+                    params=params,
+                    timeout=10
+                )
+
+                current.raise_for_status()
+
+                current = current.json()
+
+                weather = {
+
+                    "city": current["name"],
+                    "country": current["sys"]["country"],
+
+                    "temp": round(current["main"]["temp"]),
+                    "feels_like": round(current["main"]["feels_like"]),
+                    "temp_min": round(current["main"]["temp_min"]),
+                    "temp_max": round(current["main"]["temp_max"]),
+
+                    "humidity": current["main"]["humidity"],
+                    "pressure": current["main"]["pressure"],
+                    "visibility": current.get("visibility", 0) // 1000,
+
+                    "wind": round(current["wind"]["speed"], 1),
+                    "clouds": current["clouds"]["all"],
+
+                    "sunrise": datetime.fromtimestamp(
+                        current["sys"]["sunrise"]
+                    ).strftime("%I:%M %p"),
+
+                    "sunset": datetime.fromtimestamp(
+                        current["sys"]["sunset"]
+                    ).strftime("%I:%M %p"),
+
+                    "description": current["weather"][0]["description"].title(),
+                    "icon": current["weather"][0]["icon"],
+                    "main": current["weather"][0]["main"]
+
                 }
 
-                # ---------------- CURRENT WEATHER ---------------- #
+                # Forecast
+                forecast_data = requests.get(
+                    FORECAST_URL,
+                    params=params,
+                    timeout=10
+                )
 
-                response = requests.get(CURRENT_URL, params=params)
+                forecast_data.raise_for_status()
 
-                data = response.json()
+                forecast_data = forecast_data.json()
 
-                if response.status_code != 200:
-                    error = data.get("message", "City not found").title()
+                # Hourly (Next 24 Hours)
 
-                else:
+                for item in forecast_data["list"][:8]:
 
-                    weather = {
+                    hourly.append({
 
-                        "city": data["name"],
-                        "country": data["sys"]["country"],
+                        "time": datetime.strptime(
+                            item["dt_txt"],
+                            "%Y-%m-%d %H:%M:%S"
+                        ).strftime("%I %p"),
 
-                        "temp": round(data["main"]["temp"]),
-                        "feels_like": round(data["main"]["feels_like"]),
-                        "temp_min": round(data["main"]["temp_min"]),
-                        "temp_max": round(data["main"]["temp_max"]),
+                        "temp": round(item["main"]["temp"])
 
-                        "humidity": data["main"]["humidity"],
-                        "pressure": data["main"]["pressure"],
+                    })
 
-                        "visibility": data["visibility"] // 1000,
+                # 5 Day Forecast
 
-                        "wind": round(data["wind"]["speed"],1),
+                added = set()
 
-                        "clouds": data["clouds"]["all"],
+                for item in forecast_data["list"]:
 
-                        "sunrise": datetime.fromtimestamp(
-                            data["sys"]["sunrise"]
-                        ).strftime("%I:%M %p"),
+                    if "12:00:00" not in item["dt_txt"]:
+                        continue
 
-                        "sunset": datetime.fromtimestamp(
-                            data["sys"]["sunset"]
-                        ).strftime("%I:%M %p"),
+                    day = datetime.strptime(
+                        item["dt_txt"],
+                        "%Y-%m-%d %H:%M:%S"
+                    ).strftime("%a")
 
-                        "description": data["weather"][0]["description"].title(),
+                    if day in added:
+                        continue
 
-                        "icon": data["weather"][0]["icon"],
+                    forecast.append({
 
-                        "main": data["weather"][0]["main"]
+                        "day": day,
+                        "temp": round(item["main"]["temp"]),
+                        "icon": item["weather"][0]["icon"],
+                        "desc": item["weather"][0]["main"]
 
-                    }
+                    })
 
-                    # ---------------- 5 DAY FORECAST ---------------- #
+                    added.add(day)
 
-                    forecast_response = requests.get(
-                        FORECAST_URL,
-                        params=params
-                    )
+                    if len(forecast) == 5:
+                        break
 
-                    forecast_data = forecast_response.json()
+            except requests.exceptions.HTTPError:
 
-                    added_days = set()
+                error = "City not found."
 
-                    for item in forecast_data["list"]:
+            except requests.exceptions.ConnectionError:
 
-                        if "12:00:00" in item["dt_txt"]:
+                error = "No Internet Connection."
 
-                            day = datetime.strptime(
-                                item["dt_txt"],
-                                "%Y-%m-%d %H:%M:%S"
-                            ).strftime("%a")
+            except requests.exceptions.Timeout:
 
-                            if day not in added_days:
+                error = "Request Timed Out."
 
-                                forecast.append({
+            except Exception as e:
 
-                                    "day": day,
-
-                                    "temp": round(item["main"]["temp"]),
-
-                                    "icon": item["weather"][0]["icon"],
-
-                                    "desc": item["weather"][0]["main"]
-
-                                })
-
-                                added_days.add(day)
-
-            except Exception:
+                print(e)
 
                 error = "Something went wrong."
 
     return render_template(
-
         "index.html",
-
         weather=weather,
-
         forecast=forecast,
-
+        hourly=hourly,
         error=error
-
     )
 
 
