@@ -1,0 +1,480 @@
+/* ===================================
+   RESPONSIVE DESIGN
+=================================== */
+
+@media(max-width:1200px){
+
+.top-section{
+
+grid-template-columns:1fr;
+
+}
+
+.right-panel{
+
+height:300px;
+
+}
+
+.details{
+
+grid-template-columns:repeat(3,1fr);
+
+}
+
+#forecastCards{
+
+grid-template-columns:repeat(3,1fr);
+
+}
+
+}
+
+@media(max-width:768px){
+
+.weather-card{
+
+padding:25px;
+
+}
+
+.weather-card h1{
+
+font-size:32px;
+
+}
+
+.weather-main img{
+
+width:120px;
+
+}
+
+.weather-text h2{
+
+font-size:60px;
+
+}
+
+.weather-text h3{
+
+font-size:24px;
+
+}
+
+.weather-text p{
+
+font-size:18px;
+
+}
+
+.details{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+#forecastCards{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+.search-box input{
+
+font-size:16px;
+
+}
+
+}
+
+@media(max-width:500px){
+
+body{
+
+padding:10px;
+
+}
+
+.weather-card{
+
+padding:18px;
+
+border-radius:20px;
+
+}
+
+.weather-card h1{
+
+font-size:26px;
+
+}
+
+.weather-main img{
+
+width:90px;
+
+}
+
+.weather-text h2{
+
+font-size:48px;
+
+}
+
+.weather-text h3{
+
+font-size:20px;
+
+}
+
+.details{
+
+grid-template-columns:1fr;
+
+}
+
+#forecastCards{
+
+grid-template-columns:1fr;
+
+}
+
+.search-box{
+
+flex-direction:column;
+
+gap:10px;
+
+}
+
+.search-box input{
+
+border-radius:40px;
+
+}
+
+.search-box button{
+
+width:100%;
+
+border-radius:40px;
+
+height:50px;
+
+}
+
+.right-panel{
+
+height:220px;
+
+}
+
+}
+
+/* ===================================
+   WEATHER BACKGROUNDS
+=================================== */
+
+body.clear{
+
+background:linear-gradient(135deg,#4facfe,#00f2fe);
+
+}
+
+body.clouds{
+
+background:linear-gradient(135deg,#667db6,#0082c8,#0082c8,#667db6);
+
+}
+
+body.rain{
+
+background:linear-gradient(135deg,#232526,#414345);
+
+}
+
+body.drizzle{
+
+background:linear-gradient(135deg,#3a6073,#16222a);
+
+}
+
+body.snow{
+
+background:linear-gradient(135deg,#e6dada,#274046);
+
+}
+
+body.thunderstorm{
+
+background:linear-gradient(135deg,#000428,#004e92);
+
+}
+
+body.mist{
+
+background:linear-gradient(135deg,#757f9a,#d7dde8);
+
+}
+
+/* ===================================
+   SUN ANIMATION
+=================================== */
+
+body.clear::after{
+
+content:"☀";
+
+position:fixed;
+
+top:40px;
+
+right:70px;
+
+font-size:90px;
+
+animation:sunRotate 15s linear infinite;
+
+opacity:.25;
+
+}
+
+@keyframes sunRotate{
+
+from{
+
+transform:rotate(0deg);
+
+}
+
+to{
+
+transform:rotate(360deg);
+
+}
+
+}
+
+/* ===================================
+   CLOUD ANIMATION
+=================================== */
+
+body.clouds::after{
+
+content:"☁ ☁ ☁";
+
+position:fixed;
+
+top:80px;
+
+left:-300px;
+
+font-size:90px;
+
+opacity:.25;
+
+animation:cloudMove 35s linear infinite;
+
+}
+
+@keyframes cloudMove{
+
+from{
+
+left:-300px;
+
+}
+
+to{
+
+left:120%;
+
+}
+
+}
+
+/* ===================================
+   RAIN EFFECT
+=================================== */
+
+body.rain::after,
+body.drizzle::after{
+
+content:"";
+
+position:fixed;
+
+top:0;
+
+left:0;
+
+width:100%;
+
+height:100%;
+
+background-image:
+linear-gradient(transparent 90%,rgba(255,255,255,.5) 90%);
+
+background-size:3px 25px;
+
+opacity:.25;
+
+animation:rain 0.4s linear infinite;
+
+pointer-events:none;
+
+}
+
+@keyframes rain{
+
+from{
+
+background-position:0 0;
+
+}
+
+to{
+
+background-position:0 25px;
+
+}
+
+}
+
+/* ===================================
+   SNOW EFFECT
+=================================== */
+
+body.snow::after{
+
+content:"❄ ❄ ❄ ❄ ❄ ❄";
+
+position:fixed;
+
+top:-50px;
+
+left:0;
+
+width:100%;
+
+font-size:35px;
+
+animation:snowFall 12s linear infinite;
+
+opacity:.6;
+
+pointer-events:none;
+
+}
+
+@keyframes snowFall{
+
+0%{
+
+transform:translateY(-50px);
+
+}
+
+100%{
+
+transform:translateY(110vh);
+
+}
+
+}
+
+/* ===================================
+   THUNDER EFFECT
+=================================== */
+
+body.thunderstorm{
+
+animation:flashSky 6s infinite;
+
+}
+
+@keyframes flashSky{
+
+0%,92%,100%{
+
+filter:brightness(1);
+
+}
+
+94%{
+
+filter:brightness(2.3);
+
+}
+
+96%{
+
+filter:brightness(.6);
+
+}
+
+98%{
+
+filter:brightness(2);
+
+}
+
+}
+
+/* ===================================
+   CARD HOVER
+=================================== */
+
+.weather-card{
+
+transition:.35s;
+
+}
+
+.weather-card:hover{
+
+transform:translateY(-5px);
+
+box-shadow:0 25px 60px rgba(0,0,0,.35);
+
+}
+.top-section{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+gap:40px;
+
+}
+
+.left-panel{
+
+width:35%;
+
+}
+
+.right-panel{
+
+width:65%;
+
+height:320px;
+
+background:rgba(255,255,255,.10);
+
+padding:20px;
+
+border-radius:20px;
+
+}
+
+#tempChart{
+
+width:100% !important;
+
+height:260px !important;
+
+}
