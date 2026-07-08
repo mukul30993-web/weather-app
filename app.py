@@ -8,6 +8,146 @@ API_KEY = "702d27dcbf1d3d8b7c570d52f6263bfb"
 
 CURRENT_URL = "https://api.openweathermap.org/data/2.5/weather"
 FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast"
+AIR_URL = "https://api.openweathermap.org/data/2.5/air_pollution"
+
+session = requests.Session()
+
+
+def get_current_weather(city):
+    params = {
+        "q": city,
+        "appid": API_KEY,
+        "units": "metric"
+    }
+
+    response = session.get(CURRENT_URL, params=params, timeout=10)
+    response.raise_for_status()
+
+    data = response.json()
+
+    weather = {
+        "city": data["name"],
+        "country": data["sys"]["country"],
+
+        "lat": data["coord"]["lat"],
+        "lon": data["coord"]["lon"],
+
+        "temp": round(data["main"]["temp"]),
+        "feels_like": round(data["main"]["feels_like"]),
+        "temp_min": round(data["main"]["temp_min"]),
+        "temp_max": round(data["main"]["temp_max"]),
+
+        "humidity": data["main"]["humidity"],
+        "pressure": data["main"]["pressure"],
+
+        "visibility": data.get("visibility", 0) // 1000,
+
+        "wind": round(data["wind"]["speed"], 1),
+
+        "clouds": data["clouds"]["all"],
+
+        "sunrise": datetime.fromtimestamp(
+            data["sys"]["sunrise"]
+        ).strftime("%I:%M %p"),
+
+        "sunset": datetime.fromtimestamp(
+            data["sys"]["sunset"]
+        ).strftime("%I:%M %p"),
+
+        "description": data["weather"][0]["description"].title(),
+
+        "main": data["weather"][0]["main"],
+
+        "icon": data["weather"][0]["icon"]
+    }
+
+    return weather
+
+
+def get_hourly_and_forecast(city):
+    params = {
+        "q": city,
+        "appid": API_KEY,
+        "units": "metric"
+    }
+
+    response = session.get(FORECAST_URL, params=params, timeout=10)
+    response.raise_for_status()
+
+    data = response.json()
+
+    hourly = []
+
+    for item in data["list"][:8]:
+
+        hourly.append({
+            "time": datetime.strptime(
+                item["dt_txt"],
+                "%Y-%m-%d %H:%M:%S"
+            ).strftime("%I %p"),
+
+            "temp": round(item["main"]["temp"]),
+
+            "icon": item["weather"][0]["icon"]
+        })
+
+    forecast = []
+
+    added = set()
+
+    for item in data["list"]:
+
+        if "12:00:00" not in item["dt_txt"]:
+            continue
+
+        day = datetime.strptime(
+            item["dt_txt"],
+            "%Y-%m-%d %H:%M:%S"
+        ).strftime("%a")
+
+        if day in added:
+            continue
+
+        forecast.append({
+
+            "day": day,
+
+            "temp": round(item["main"]["temp"]),
+
+            "icon": item["weather"][0]["icon"],
+
+            "desc": item["weather"][0]["main"]
+        })
+
+        added.add(day)
+
+        if len(forecast) == 5:
+            break
+
+    return hourly, forecast
+
+
+def get_air_quality(lat, lon):
+
+    params = {
+        "lat": lat,
+        "lon": lon,
+        "appid": API_KEY
+    }
+
+    try:
+
+        response = session.get(AIR_URL, params=params, timeout=10)
+
+        response.raise_for_status()
+
+        data = response.json()
+
+        return data["list"][0]["main"]["aqi"]
+
+    except Exception:
+
+        return None
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -16,6 +156,7 @@ def home():
     weather = None
     forecast = []
     hourly = []
+    aqi = None
     error = None
 
     if request.method == "POST":
@@ -24,112 +165,16 @@ def home():
 
         if city:
 
-            params = {
-                "q": city,
-                "appid": API_KEY,
-                "units": "metric"
-            }
-
             try:
 
-                # Current Weather
-                current = requests.get(
-                    CURRENT_URL,
-                    params=params,
-                    timeout=10
+                weather = get_current_weather(city)
+
+                hourly, forecast = get_hourly_and_forecast(city)
+
+                aqi = get_air_quality(
+                    weather["lat"],
+                    weather["lon"]
                 )
-
-                current.raise_for_status()
-
-                current = current.json()
-
-                weather = {
-
-                    "city": current["name"],
-                    "country": current["sys"]["country"],
-
-                    "temp": round(current["main"]["temp"]),
-                    "feels_like": round(current["main"]["feels_like"]),
-                    "temp_min": round(current["main"]["temp_min"]),
-                    "temp_max": round(current["main"]["temp_max"]),
-
-                    "humidity": current["main"]["humidity"],
-                    "pressure": current["main"]["pressure"],
-                    "visibility": current.get("visibility", 0) // 1000,
-
-                    "wind": round(current["wind"]["speed"], 1),
-                    "clouds": current["clouds"]["all"],
-
-                    "sunrise": datetime.fromtimestamp(
-                        current["sys"]["sunrise"]
-                    ).strftime("%I:%M %p"),
-
-                    "sunset": datetime.fromtimestamp(
-                        current["sys"]["sunset"]
-                    ).strftime("%I:%M %p"),
-
-                    "description": current["weather"][0]["description"].title(),
-                    "icon": current["weather"][0]["icon"],
-                    "main": current["weather"][0]["main"]
-
-                }
-
-                # Forecast
-                forecast_data = requests.get(
-                    FORECAST_URL,
-                    params=params,
-                    timeout=10
-                )
-
-                forecast_data.raise_for_status()
-
-                forecast_data = forecast_data.json()
-
-                # Hourly (Next 24 Hours)
-
-                for item in forecast_data["list"][:8]:
-
-                    hourly.append({
-
-                        "time": datetime.strptime(
-                            item["dt_txt"],
-                            "%Y-%m-%d %H:%M:%S"
-                        ).strftime("%I %p"),
-
-                        "temp": round(item["main"]["temp"])
-
-                    })
-
-                # 5 Day Forecast
-
-                added = set()
-
-                for item in forecast_data["list"]:
-
-                    if "12:00:00" not in item["dt_txt"]:
-                        continue
-
-                    day = datetime.strptime(
-                        item["dt_txt"],
-                        "%Y-%m-%d %H:%M:%S"
-                    ).strftime("%a")
-
-                    if day in added:
-                        continue
-
-                    forecast.append({
-
-                        "day": day,
-                        "temp": round(item["main"]["temp"]),
-                        "icon": item["weather"][0]["icon"],
-                        "desc": item["weather"][0]["main"]
-
-                    })
-
-                    added.add(day)
-
-                    if len(forecast) == 5:
-                        break
 
             except requests.exceptions.HTTPError:
 
@@ -137,11 +182,11 @@ def home():
 
             except requests.exceptions.ConnectionError:
 
-                error = "No Internet Connection."
+                error = "No internet connection."
 
             except requests.exceptions.Timeout:
 
-                error = "Request Timed Out."
+                error = "Request timed out."
 
             except Exception as e:
 
@@ -154,9 +199,10 @@ def home():
         weather=weather,
         forecast=forecast,
         hourly=hourly,
+        aqi=aqi,
         error=error
     )
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

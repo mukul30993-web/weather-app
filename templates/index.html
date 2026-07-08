@@ -3,221 +3,516 @@
 
 <head>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
 
-    <title>Weather Dashboard</title>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+<title>Weather Dashboard Pro</title>
 
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet"
+href="{{ url_for('static', filename='style.css') }}">
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
 <body class="{% if weather %}{{ weather.main|lower }}{% endif %}">
 
+<!-- ===============================
+Animated Background
+=============================== -->
+
+<div class="sky">
+
+<div class="sun"></div>
+
+<div class="moon"></div>
+
+<div class="stars"></div>
+
+<div class="rain"></div>
+
+<div class="snow"></div>
+
+<div class="cloud cloud1"></div>
+
+<div class="cloud cloud2"></div>
+
+<div class="cloud cloud3"></div>
+
+</div>
+
 <div class="container">
 
-    <div class="weather-card">
+<div class="weather-card">
 
-        <h1>
-            <i class="fa-solid fa-cloud-sun"></i>
-            Weather Dashboard
-        </h1>
+<!-- ===============================
+HEADER
+=============================== -->
 
-        <form method="POST" class="search-box">
+<div class="title-bar">
 
-            <input
-                type="text"
-                name="city"
-                placeholder="Enter city name..."
-                value="{{ request.form.get('city','') }}"
-                autocomplete="off"
-                required>
+<div>
 
-            <button type="submit">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
+<h1>
 
-        </form>
+<i class="fa-solid fa-cloud-sun"></i>
 
-        {% if error %}
-        <p class="error">{{ error }}</p>
-        {% endif %}
+Weather Dashboard Pro
 
-        {% if weather %}
+</h1>
 
-        <!-- Top Section -->
+<p class="subtitle">
 
-        <div class="top-section">
+Live Weather Forecast with Beautiful Animations
 
-            <div class="left-panel">
+</p>
 
-                <div class="weather-main">
+</div>
 
-                    <div class="weather-icon">
+<div class="top-right">
 
-                        <img
-                            src="https://openweathermap.org/img/wn/{{ weather.icon }}@4x.png"
-                            alt="Weather">
+<span id="liveClock"></span>
 
-                    </div>
+<button
+id="themeToggle"
+class="theme-btn">
 
-                    <div class="weather-text">
+<i class="fa-solid fa-moon"></i>
 
-                        <h2>{{ weather.temp }}°C</h2>
+</button>
 
-                        <h3>{{ weather.city }}, {{ weather.country }}</h3>
+</div>
 
-                        <p>{{ weather.description }}</p>
+</div>
 
-                    </div>
+<!-- ===============================
+SEARCH BAR
+=============================== -->
 
-                </div>
+<form method="POST"
+class="search-box">
+
+<div class="search-wrapper">
+
+<i class="fa-solid fa-location-dot"></i>
+
+<input
+
+type="text"
+
+name="city"
+
+placeholder="Search city..."
+
+autocomplete="off"
+
+value="{{ request.form.get('city','') }}"
+
+required>
+
+</div>
+
+<button type="submit">
+
+<i class="fa-solid fa-magnifying-glass"></i>
+
+</button>
+
+</form>
+
+{% if error %}
+
+<div class="error">
+
+<i class="fa-solid fa-circle-exclamation"></i>
+
+{{ error }}
+
+</div>
+
+{% endif %}
+
+{% if weather %}
+
+<!-- ===============================
+HERO SECTION
+=============================== -->
+
+<section class="hero">
+
+<div class="hero-left">
+
+<div class="weather-icon">
+
+<img
+
+src="https://openweathermap.org/img/wn/{{ weather.icon }}@4x.png"
+
+alt="Weather">
+
+</div>
+
+<div class="hero-info">
+
+<h2>
+
+{{ weather.temp }}°
+
+</h2>
+
+<h3>
+
+{{ weather.city }},
+
+{{ weather.country }}
+
+</h3>
+
+<p>
+
+{{ weather.description }}
+
+</p>
+
+<div class="hero-extra">
+
+<span>
+
+<i class="fa-solid fa-temperature-half"></i>
+
+Feels Like
+
+<b>{{ weather.feels_like }}°C</b>
+
+</span>
+
+<span>
+
+<i class="fa-solid fa-wind"></i>
+
+{{ weather.wind }} m/s
+
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="hero-right">
+
+<div class="chart-card">
+
+<h3>
+
+<i class="fa-solid fa-chart-line"></i>
+
+Hourly Temperature
+
+</h3>
+
+<canvas id="tempChart"></canvas>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===============================
+WEATHER DETAILS
+=============================== -->
+
+<div class="details">
+
+<div class="box">
+
+<i class="fa-solid fa-temperature-low"></i>
+
+<h4>Min Temp</h4>
+
+<p>{{ weather.temp_min }}°C</p>
+
+</div>
+
+<div class="box">
+
+<i class="fa-solid fa-temperature-high"></i>
+
+<h4>Max Temp</h4>
+
+<p>{{ weather.temp_max }}°C</p>
+
+</div>
+
+<div class="box">
+
+<i class="fa-solid fa-temperature-half"></i>
+
+<h4>Feels Like</h4>
+
+<p>{{ weather.feels_like }}°C</p>
+
+</div>
+
+<div class="box">
+
+<i class="fa-solid fa-droplet"></i>
+
+<h4>Humidity</h4>
+
+<p>{{ weather.humidity }}%</p>
+
+</div>
+
+<div class="box">
+
+<i class="fa-solid fa-wind"></i>
+
+<h4>Wind Speed</h4>
+
+<p>{{ weather.wind }} m/s</p>
+
+</div>
+
+<div class="box">
+
+<i class="fa-solid fa-eye"></i>
+
+<h4>Visibility</h4>
+
+<p>{{ weather.visibility }} km</p>
+
+</div>
+
+<div class="box">
+
+<i class="fa-solid fa-cloud"></i>
+
+<h4>Clouds</h4>
+
+<p>{{ weather.clouds }}%</p>
+
+</div>
+
+<div class="box">
+
+<i class="fa-solid fa-gauge-high"></i>
+
+<h4>Pressure</h4>
+
+<p>{{ weather.pressure }} hPa</p>
+
+</div>
+
+<div class="box">
+
+<i class="fa-solid fa-sun"></i>
+
+<h4>Sunrise</h4>
+
+<p>{{ weather.sunrise }}</p>
+
+</div>
+
+<div class="box">
+
+<i class="fa-solid fa-moon"></i>
+
+<h4>Sunset</h4>
+
+<p>{{ weather.sunset }}</p>
+
+</div>
+
+{% if aqi %}
+
+<div class="box">
+
+<i class="fa-solid fa-leaf"></i>
+
+<h4>Air Quality</h4>
+
+<p>AQI {{ aqi }}</p>
+
+</div>
+
+{% endif %}
+
+
+</div>
+<!-- ===============================
+        5 DAY FORECAST
+=============================== -->
+
+<section class="forecast">
+
+    <div class="section-title">
+
+        <h2>
+
+            <i class="fa-solid fa-calendar-days"></i>
+
+            5 Day Forecast
+
+        </h2>
+
+    </div>
+
+    <div id="forecastCards">
+
+        {% if forecast %}
+
+            {% for day in forecast %}
+
+            <div class="forecast-card">
+
+                <h3>{{ day.day }}</h3>
+
+                <img
+                    src="https://openweathermap.org/img/wn/{{ day.icon }}@2x.png"
+                    alt="{{ day.desc }}">
+
+                <h2>{{ day.temp }}°</h2>
+
+                <p>{{ day.desc }}</p>
 
             </div>
 
-            <div class="right-panel">
+            {% endfor %}
 
-                <h3>Hourly Temperature</h3>
+        {% else %}
 
-                <canvas id="tempChart"></canvas>
+            <div class="forecast-placeholder">
 
-            </div>
-
-        </div>
-
-        <!-- Details -->
-
-        <div class="details">
-
-            <div class="box">
-                <i class="fa-solid fa-arrow-down"></i>
-                <h4>Min Temp</h4>
-                <p>{{ weather.temp_min }}°C</p>
-            </div>
-
-            <div class="box">
-                <i class="fa-solid fa-arrow-up"></i>
-                <h4>Max Temp</h4>
-                <p>{{ weather.temp_max }}°C</p>
-            </div>
-
-            <div class="box">
-                <i class="fa-solid fa-temperature-half"></i>
-                <h4>Feels Like</h4>
-                <p>{{ weather.feels_like }}°C</p>
-            </div>
-
-            <div class="box">
-                <i class="fa-solid fa-droplet"></i>
-                <h4>Humidity</h4>
-                <p>{{ weather.humidity }}%</p>
-            </div>
-
-            <div class="box">
-                <i class="fa-solid fa-wind"></i>
-                <h4>Wind</h4>
-                <p>{{ weather.wind }} m/s</p>
-            </div>
-
-            <div class="box">
-                <i class="fa-solid fa-eye"></i>
-                <h4>Visibility</h4>
-                <p>{{ weather.visibility }} km</p>
-            </div>
-
-            <div class="box">
-                <i class="fa-solid fa-cloud"></i>
-                <h4>Clouds</h4>
-                <p>{{ weather.clouds }}%</p>
-            </div>
-
-            <div class="box">
-                <i class="fa-solid fa-gauge-high"></i>
-                <h4>Pressure</h4>
-                <p>{{ weather.pressure }} hPa</p>
-            </div>
-
-            <div class="box">
-                <i class="fa-solid fa-sun"></i>
-                <h4>Sunrise</h4>
-                <p>{{ weather.sunrise }}</p>
-            </div>
-
-            <div class="box">
-                <i class="fa-solid fa-moon"></i>
-                <h4>Sunset</h4>
-                <p>{{ weather.sunset }}</p>
-            </div>
-
-        </div>
-
-        <!-- Forecast -->
-
-        <div class="forecast">
-
-            <h2>
-
-                <i class="fa-solid fa-calendar-days"></i>
-
-                5-Day Forecast
-
-            </h2>
-
-            <div id="forecastCards">
-
-                {% for day in forecast %}
-
-                <div class="forecast-card">
-
-                    <h3>{{ day.day }}</h3>
-
-                    <img
-                        src="https://openweathermap.org/img/wn/{{ day.icon }}@2x.png"
-                        alt="Forecast">
-
-                    <p>{{ day.temp }}°C</p>
-
-                    <span>{{ day.desc }}</span>
-
-                </div>
-
-                {% endfor %}
+                Forecast unavailable
 
             </div>
-
-        </div>
 
         {% endif %}
 
     </div>
+
+</section>
+
+<!-- ===============================
+        WEATHER HIGHLIGHTS
+=============================== -->
+
+<section class="highlights">
+
+    <div class="highlight-card">
+
+        <i class="fa-solid fa-temperature-half"></i>
+
+        <div>
+
+            <h4>Feels Like</h4>
+
+            <p>{{ weather.feels_like }}°C</p>
+
+        </div>
+
+    </div>
+
+    <div class="highlight-card">
+
+        <i class="fa-solid fa-droplet"></i>
+
+        <div>
+
+            <h4>Humidity</h4>
+
+            <p>{{ weather.humidity }}%</p>
+
+        </div>
+
+    </div>
+
+    <div class="highlight-card">
+
+        <i class="fa-solid fa-eye"></i>
+
+        <div>
+
+            <h4>Visibility</h4>
+
+            <p>{{ weather.visibility }} km</p>
+
+        </div>
+
+    </div>
+
+    <div class="highlight-card">
+
+        <i class="fa-solid fa-cloud"></i>
+
+        <div>
+
+            <h4>Cloud Coverage</h4>
+
+            <p>{{ weather.clouds }}%</p>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ===============================
+        FOOTER
+=============================== -->
+
+<footer class="footer">
+
+    <div class="footer-left">
+
+        <i class="fa-solid fa-cloud-sun"></i>
+
+        Weather Dashboard Pro
+
+    </div>
+
+    <div class="footer-right">
+
+        Flask • OpenWeather API • Chart.js
+
+    </div>
+
+</footer>
+
+{% endif %}
+
+</div>
 
 </div>
 
 {% if hourly %}
 <script>
 
-const hourlyLabels = [
-{% for item in hourly %}
-"{{ item.time }}",
-{% endfor %}
-];
+const hourlyLabels = "{{ hourly | map(attribute='time') | list | tojson }}";
 
-const hourlyTemps = [
-{% for item in hourly %}
-{{ item.temp }},
-{% endfor %}
-];
+const hourlyTemps = "{{ hourly | map(attribute='temp') | list | tojson }}";
+
+console.log("Labels:", hourlyLabels);
+console.log("Temps:", hourlyTemps);
 
 </script>
 {% endif %}
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
+<script src="{{ url_for('static', filename='darkmode.js') }}"></script>
+</body>
+</html>"
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+<script src="{{ url_for('static', filename='darkmode.js') }}"></script>
 
 </body>
 </html>
