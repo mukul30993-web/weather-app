@@ -3,46 +3,46 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-<title>Weather Dashboard Pro</title>
+    <title>Weather Dashboard Pro</title>
 
-<link rel="stylesheet"
-href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
 <body class="{% if weather %}{{ weather.main|lower }}{% endif %}">
 
-<!-- ===============================
-Animated Background
-=============================== -->
+<!-- ===========================
+     Animated Background
+=========================== -->
 
 <div class="sky">
 
-<div class="sun"></div>
+    <div class="sun"></div>
 
-<div class="moon"></div>
+    <div class="moon"></div>
 
-<div class="stars"></div>
+    <div class="stars"></div>
 
-<div class="rain"></div>
+    <div class="rain"></div>
 
-<div class="snow"></div>
+    <div class="snow"></div>
 
-<div class="cloud cloud1"></div>
+    <div class="cloud cloud1"></div>
 
-<div class="cloud cloud2"></div>
+    <div class="cloud cloud2"></div>
 
-<div class="cloud cloud3"></div>
+    <div class="cloud cloud3"></div>
 
 </div>
 
@@ -50,9 +50,9 @@ Animated Background
 
 <div class="weather-card">
 
-<!-- ===============================
-HEADER
-=============================== -->
+<!-- ===========================
+        HEADER
+=========================== -->
 
 <div class="title-bar">
 
@@ -68,7 +68,7 @@ Weather Dashboard Pro
 
 <p class="subtitle">
 
-Live Weather Forecast with Beautiful Animations
+Live Weather Forecast • AQI • 5 Day Forecast
 
 </p>
 
@@ -90,9 +90,9 @@ class="theme-btn">
 
 </div>
 
-<!-- ===============================
-SEARCH BAR
-=============================== -->
+<!-- ===========================
+        SEARCH
+=========================== -->
 
 <form method="POST"
 class="search-box">
@@ -107,7 +107,7 @@ type="text"
 
 name="city"
 
-placeholder="Search city..."
+placeholder="Search any city..."
 
 autocomplete="off"
 
@@ -139,9 +139,9 @@ required>
 
 {% if weather %}
 
-<!-- ===============================
-HERO SECTION
-=============================== -->
+<!-- ===========================
+        HERO SECTION
+=========================== -->
 
 <section class="hero">
 
@@ -150,9 +150,8 @@ HERO SECTION
 <div class="weather-icon">
 
 <img
-
 src="https://openweathermap.org/img/wn/{{ weather.icon }}@4x.png"
-
+class="weather-img"
 alt="Weather">
 
 </div>
@@ -224,36 +223,143 @@ Hourly Temperature
 </div>
 
 </section>
-
-<!-- ===============================
-WEATHER DETAILS
-=============================== -->
+<!-- ===========================
+        WEATHER DETAILS
+=========================== -->
 
 <div class="details">
 
 <div class="box">
-
 <i class="fa-solid fa-temperature-low"></i>
-
 <h4>Min Temp</h4>
-
 <p>{{ weather.temp_min }}°C</p>
-
 </div>
 
 <div class="box">
-
 <i class="fa-solid fa-temperature-high"></i>
-
 <h4>Max Temp</h4>
-
 <p>{{ weather.temp_max }}°C</p>
-
 </div>
 
 <div class="box">
+<i class="fa-solid fa-droplet"></i>
+<h4>Humidity</h4>
+<p>{{ weather.humidity }}%</p>
+</div>
+
+<div class="box">
+<i class="fa-solid fa-wind"></i>
+<h4>Wind Speed</h4>
+<p>{{ weather.wind }} m/s</p>
+</div>
+
+<div class="box">
+<i class="fa-solid fa-eye"></i>
+<h4>Visibility</h4>
+<p>{{ weather.visibility }} km</p>
+</div>
+
+<div class="box">
+<i class="fa-solid fa-cloud"></i>
+<h4>Clouds</h4>
+<p>{{ weather.clouds }}%</p>
+</div>
+
+<div class="box">
+<i class="fa-solid fa-gauge-high"></i>
+<h4>Pressure</h4>
+<p>{{ weather.pressure }} hPa</p>
+</div>
+
+<div class="box">
+<i class="fa-solid fa-sun"></i>
+<h4>Sunrise</h4>
+<p>{{ weather.sunrise }}</p>
+</div>
+
+<div class="box">
+<i class="fa-solid fa-moon"></i>
+<h4>Sunset</h4>
+<p>{{ weather.sunset }}</p>
+</div>
+
+{% if aqi %}
+
+<div class="box">
+<i class="fa-solid fa-leaf"></i>
+<h4>Air Quality</h4>
+<p>AQI {{ aqi }}</p>
+</div>
+
+{% endif %}
+
+</div>
+
+<!-- ===========================
+        5 DAY FORECAST
+=========================== -->
+
+<section class="forecast">
+
+<div class="section-title">
+
+<h2>
+
+<i class="fa-solid fa-calendar-days"></i>
+
+5 Day Forecast
+
+</h2>
+
+</div>
+
+<div id="forecastCards">
+
+{% if forecast %}
+
+{% for day in forecast %}
+
+<div class="forecast-card">
+
+<h3>{{ day.day }}</h3>
+
+<img
+src="https://openweathermap.org/img/wn/{{ day.icon }}@2x.png"
+alt="{{ day.desc }}">
+
+<h2>{{ day.temp }}°</h2>
+
+<p>{{ day.desc }}</p>
+
+</div>
+
+{% endfor %}
+
+{% else %}
+
+<div class="forecast-placeholder">
+
+Forecast unavailable
+
+</div>
+
+{% endif %}
+
+</div>
+
+</section>
+
+<!-- ===========================
+        WEATHER HIGHLIGHTS
+=========================== -->
+
+<section class="highlights">
+
+<div class="highlight-card">
 
 <i class="fa-solid fa-temperature-half"></i>
+
+<div>
 
 <h4>Feels Like</h4>
 
@@ -261,9 +367,13 @@ WEATHER DETAILS
 
 </div>
 
-<div class="box">
+</div>
+
+<div class="highlight-card">
 
 <i class="fa-solid fa-droplet"></i>
+
+<div>
 
 <h4>Humidity</h4>
 
@@ -271,19 +381,13 @@ WEATHER DETAILS
 
 </div>
 
-<div class="box">
-
-<i class="fa-solid fa-wind"></i>
-
-<h4>Wind Speed</h4>
-
-<p>{{ weather.wind }} m/s</p>
-
 </div>
 
-<div class="box">
+<div class="highlight-card">
 
 <i class="fa-solid fa-eye"></i>
+
+<div>
 
 <h4>Visibility</h4>
 
@@ -291,202 +395,45 @@ WEATHER DETAILS
 
 </div>
 
-<div class="box">
+</div>
+
+<div class="highlight-card">
 
 <i class="fa-solid fa-cloud"></i>
 
-<h4>Clouds</h4>
+<div>
+
+<h4>Cloud Coverage</h4>
 
 <p>{{ weather.clouds }}%</p>
 
 </div>
 
-<div class="box">
-
-<i class="fa-solid fa-gauge-high"></i>
-
-<h4>Pressure</h4>
-
-<p>{{ weather.pressure }} hPa</p>
-
 </div>
-
-<div class="box">
-
-<i class="fa-solid fa-sun"></i>
-
-<h4>Sunrise</h4>
-
-<p>{{ weather.sunrise }}</p>
-
-</div>
-
-<div class="box">
-
-<i class="fa-solid fa-moon"></i>
-
-<h4>Sunset</h4>
-
-<p>{{ weather.sunset }}</p>
-
-</div>
-
-{% if aqi %}
-
-<div class="box">
-
-<i class="fa-solid fa-leaf"></i>
-
-<h4>Air Quality</h4>
-
-<p>AQI {{ aqi }}</p>
-
-</div>
-
-{% endif %}
-
-
-</div>
-<!-- ===============================
-        5 DAY FORECAST
-=============================== -->
-
-<section class="forecast">
-
-    <div class="section-title">
-
-        <h2>
-
-            <i class="fa-solid fa-calendar-days"></i>
-
-            5 Day Forecast
-
-        </h2>
-
-    </div>
-
-    <div id="forecastCards">
-
-        {% if forecast %}
-
-            {% for day in forecast %}
-
-            <div class="forecast-card">
-
-                <h3>{{ day.day }}</h3>
-
-                <img
-                    src="https://openweathermap.org/img/wn/{{ day.icon }}@2x.png"
-                    alt="{{ day.desc }}">
-
-                <h2>{{ day.temp }}°</h2>
-
-                <p>{{ day.desc }}</p>
-
-            </div>
-
-            {% endfor %}
-
-        {% else %}
-
-            <div class="forecast-placeholder">
-
-                Forecast unavailable
-
-            </div>
-
-        {% endif %}
-
-    </div>
 
 </section>
 
-<!-- ===============================
-        WEATHER HIGHLIGHTS
-=============================== -->
-
-<section class="highlights">
-
-    <div class="highlight-card">
-
-        <i class="fa-solid fa-temperature-half"></i>
-
-        <div>
-
-            <h4>Feels Like</h4>
-
-            <p>{{ weather.feels_like }}°C</p>
-
-        </div>
-
-    </div>
-
-    <div class="highlight-card">
-
-        <i class="fa-solid fa-droplet"></i>
-
-        <div>
-
-            <h4>Humidity</h4>
-
-            <p>{{ weather.humidity }}%</p>
-
-        </div>
-
-    </div>
-
-    <div class="highlight-card">
-
-        <i class="fa-solid fa-eye"></i>
-
-        <div>
-
-            <h4>Visibility</h4>
-
-            <p>{{ weather.visibility }} km</p>
-
-        </div>
-
-    </div>
-
-    <div class="highlight-card">
-
-        <i class="fa-solid fa-cloud"></i>
-
-        <div>
-
-            <h4>Cloud Coverage</h4>
-
-            <p>{{ weather.clouds }}%</p>
-
-        </div>
-
-    </div>
-
-</section>
-
-<!-- ===============================
+<!-- ===========================
         FOOTER
-=============================== -->
+=========================== -->
 
 <footer class="footer">
 
-    <div class="footer-left">
+<div class="footer-left">
 
-        <i class="fa-solid fa-cloud-sun"></i>
+<i class="fa-solid fa-cloud-sun"></i>
 
-        Weather Dashboard Pro
+Weather Dashboard Pro
 
-    </div>
+</div>
 
-    <div class="footer-right">
+<div class="footer-right">
 
-        Flask • OpenWeather API • Chart.js
+Flask • OpenWeather API • Chart.js
 
-    </div>
+</div>
 
 </footer>
-
 {% endif %}
 
 </div>
@@ -494,25 +441,21 @@ WEATHER DETAILS
 </div>
 
 {% if hourly %}
+
 <script>
 
-const hourlyLabels = "{{ hourly | map(attribute='time') | list | tojson }}";
+const hourlyLabels = {{ hourly | map(attribute='time') | list | tojson | safe }};
 
-const hourlyTemps = "{{ hourly | map(attribute='temp') | list | tojson }}";
-
-console.log("Labels:", hourlyLabels);
-console.log("Temps:", hourlyTemps);
+const hourlyTemps = {{ hourly | map(attribute='temp') | list | tojson | safe }};
 
 </script>
+
 {% endif %}
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
-<script src="{{ url_for('static', filename='darkmode.js') }}"></script>
-</body>
-</html>"
-<script src="{{ url_for('static', filename='script.js') }}"></script>
 
 <script src="{{ url_for('static', filename='darkmode.js') }}"></script>
 
 </body>
+
 </html>

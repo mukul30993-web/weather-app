@@ -25,6 +25,16 @@ def get_current_weather(city):
 
     data = response.json()
 
+    # -------- DEBUG --------
+    print("=" * 40)
+    print("City:", data["name"])
+    print("Weather Main:", data["weather"][0]["main"])
+    print("Weather Description:", data["weather"][0]["description"])
+    print("Temperature:", data["main"]["temp"])
+    print("Icon:", data["weather"][0]["icon"])
+    print("=" * 40)
+    # -----------------------
+
     weather = {
         "city": data["name"],
         "country": data["sys"]["country"],
