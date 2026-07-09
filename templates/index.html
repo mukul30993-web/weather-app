@@ -93,35 +93,31 @@ class="theme-btn">
 <!-- ===========================
         SEARCH
 =========================== -->
+<form action="/" method="POST" class="search-box">
+    <div class="search-wrapper">
+        <i class="fa-solid fa-location-dot"></i>
 
-<form method="POST"
-class="search-box">
+        <input
+            type="text"
+            name="city"
+            placeholder="Search any city..."
+            value="{{ request.form.get('city','') }}"
+            autocomplete="off"
+            required>
+    </div>
 
-<div class="search-wrapper">
+    <button type="submit">
+        <i class="fa-solid fa-magnifying-glass"></i>
+    </button>
 
-<i class="fa-solid fa-location-dot"></i>
+    <button
+        type="button"
+        id="locationBtn"
+        class="gps-btn">
 
-<input
+        <i class="fa-solid fa-location-crosshairs"></i>
 
-type="text"
-
-name="city"
-
-placeholder="Search any city..."
-
-autocomplete="off"
-
-value="{{ request.form.get('city','') }}"
-
-required>
-
-</div>
-
-<button type="submit">
-
-<i class="fa-solid fa-magnifying-glass"></i>
-
-</button>
+    </button>
 
 </form>
 

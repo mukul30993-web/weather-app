@@ -425,3 +425,57 @@ if(body.classList.contains("clouds")){
 }
 
 console.log("Weather Dashboard Loaded Successfully");
+// =====================================
+// GPS LOCATION
+// =====================================
+
+const locationBtn = document.getElementById("locationBtn");
+
+console.log(locationBtn);
+
+if (locationBtn) {
+
+    locationBtn.onclick = function () {
+
+        alert("GPS button clicked");
+
+        if (!navigator.geolocation) {
+            alert("Geolocation is not supported");
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+           function(position){
+
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
+
+    window.location.href = "/location?lat=" + lat + "&lon=" + lon;
+
+},
+            function(error){
+
+                alert(error.message);
+
+            }
+        );
+
+    };
+
+}
+
+function getLocationSuccess(position) {
+
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
+
+    console.log("Latitude:", lat);
+    console.log("Longitude:", lon);
+
+}
+
+function getLocationError() {
+
+    alert("Unable to access your location.");
+
+}

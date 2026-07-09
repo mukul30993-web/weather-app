@@ -1235,3 +1235,52 @@ transform:translateY(0);
 }
 
 }
+/* ===========================
+   GPS BUTTON
+=========================== */
+
+.gps-btn{
+
+    width:58px;
+
+    height:58px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:linear-gradient(135deg,#00c6ff,#0072ff);
+
+    color:#fff;
+
+    font-size:22px;
+
+    cursor:pointer;
+
+    margin-left:12px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    transition:.35s;
+
+    box-shadow:0 10px 30px rgba(0,114,255,.35);
+
+}
+
+.gps-btn:hover{
+
+    transform:translateY(-3px) scale(1.08);
+
+    box-shadow:0 15px 35px rgba(0,114,255,.55);
+
+}
+
+.gps-btn:active{
+
+    transform:scale(.95);
+
+}
