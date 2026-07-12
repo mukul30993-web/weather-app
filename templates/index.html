@@ -142,80 +142,81 @@ class="theme-btn">
 <section class="hero">
 
     <!-- LEFT SIDE -->
+
     <div class="hero-left">
 
         <img
             src="https://openweathermap.org/img/wn/{{ weather.icon }}@4x.png"
             class="weather-img"
-            alt="Weather">
+            alt="Weather Icon">
 
-        <div class="hero-info">
+        <h1 class="temp">{{ weather.temp }}°C</h1>
 
-            <h2 class="temp">{{ weather.temp }}°C</h2>
+        <h2 class="city">
+            <i class="fa-solid fa-location-dot"></i>
+            {{ weather.city }}, {{ weather.country }}
+        </h2>
 
-            <h3 class="city">
-                <i class="fa-solid fa-location-dot"></i>
-                {{ weather.city }}, {{ weather.country }}
-            </h3>
+        <p class="desc">
+            {{ weather.description }}
+        </p>
 
-            <p class="desc">
-                {{ weather.description }}
-            </p>
+        <div class="hero-stats">
 
-            <div class="hero-stats">
-
-                <div class="stat">
-                    <i class="fa-solid fa-temperature-half"></i>
-                    <span>Feels Like</span>
-                    <strong>{{ weather.feels_like }}°C</strong>
-                </div>
-
-                <div class="stat">
-                    <i class="fa-solid fa-droplet"></i>
-                    <span>Humidity</span>
-                    <strong>{{ weather.humidity }}%</strong>
-                </div>
-
-                <div class="stat">
-                    <i class="fa-solid fa-wind"></i>
-                    <span>Wind</span>
-                    <strong>{{ weather.wind }} m/s</strong>
-                </div>
-
-                <div class="stat">
-                    <i class="fa-solid fa-cloud"></i>
-                    <span>Clouds</span>
-                    <strong>{{ weather.clouds }}%</strong>
-                </div>
-
-                <div class="stat">
-                    <i class="fa-solid fa-eye"></i>
-                    <span>Visibility</span>
-                    <strong>{{ weather.visibility }} km</strong>
-                </div>
-
-                {% if aqi %}
-                <div class="stat">
-                    <i class="fa-solid fa-leaf"></i>
-                    <span>AQI</span>
-                    <strong>{{ aqi }}</strong>
-                </div>
-                {% endif %}
-
+            <div class="stat">
+                <i class="fa-solid fa-temperature-half"></i>
+                <span>Feels Like</span>
+                <strong>{{ weather.feels_like }}°C</strong>
             </div>
+
+            <div class="stat">
+                <i class="fa-solid fa-droplet"></i>
+                <span>Humidity</span>
+                <strong>{{ weather.humidity }}%</strong>
+            </div>
+
+            <div class="stat">
+                <i class="fa-solid fa-wind"></i>
+                <span>Wind</span>
+                <strong>{{ weather.wind }} m/s</strong>
+            </div>
+
+            <div class="stat">
+                <i class="fa-solid fa-cloud"></i>
+                <span>Clouds</span>
+                <strong>{{ weather.clouds }}%</strong>
+            </div>
+
+            <div class="stat">
+                <i class="fa-solid fa-eye"></i>
+                <span>Visibility</span>
+                <strong>{{ weather.visibility }} km</strong>
+            </div>
+
+            {% if aqi %}
+            <div class="stat">
+                <i class="fa-solid fa-leaf"></i>
+                <span>AQI</span>
+                <strong>{{ aqi }}</strong>
+            </div>
+            {% endif %}
 
         </div>
 
     </div>
 
     <!-- RIGHT SIDE -->
+
     <div class="hero-right">
 
         <div class="chart-card">
 
             <h3>
+
                 <i class="fa-solid fa-chart-line"></i>
+
                 Hourly Temperature
+
             </h3>
 
             <canvas id="tempChart"></canvas>
