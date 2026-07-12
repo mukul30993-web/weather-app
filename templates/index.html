@@ -1,423 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Weather Dashboard Pro</title>
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
-
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1220">
+  <title>Atmos | Weather dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
-<body class="{% if weather %}{{ weather.main|lower }}{% endif %}">
-
-<!-- ===========================
-     Animated Background
-=========================== -->
-
-<div class="sky">
-
-    <div class="sun"></div>
-
-    <div class="moon"></div>
-
-    <div class="stars"></div>
-
-    <div class="rain"></div>
-
-    <div class="snow"></div>
-
-    <div class="cloud cloud1"></div>
-
-    <div class="cloud cloud2"></div>
-
-    <div class="cloud cloud3"></div>
-
-</div>
-
-<div class="container">
-
-<div class="weather-card">
-
-<!-- ===========================
-        HEADER
-=========================== -->
-
-<div class="title-bar">
-
-<div>
-
-<h1>
-
-<i class="fa-solid fa-cloud-sun"></i>
-
-Weather Dashboard Pro
-
-</h1>
-
-<p class="subtitle">
-
-Live Weather Forecast • AQI • 5 Day Forecast
-
-</p>
-
-</div>
-
-<div class="top-right">
-
-<span id="liveClock"></span>
-
-<button
-id="themeToggle"
-class="theme-btn">
-
-<i class="fa-solid fa-moon"></i>
-
-</button>
-
-</div>
-
-</div>
-
-<!-- ===========================
-        SEARCH
-=========================== -->
-<form action="/" method="POST" class="search-box">
-    <div class="search-wrapper">
-        <i class="fa-solid fa-location-dot"></i>
-
-        <input
-            type="text"
-            name="city"
-            placeholder="Search any city..."
-            value="{{ request.form.get('city','') }}"
-            autocomplete="off"
-            required>
-    </div>
-
-    <button type="submit">
-        <i class="fa-solid fa-magnifying-glass"></i>
-    </button>
-
-    <button
-        type="button"
-        id="locationBtn"
-        class="gps-btn">
-
-        <i class="fa-solid fa-location-crosshairs"></i>
-
-    </button>
-
-</form>
-
-{% if error %}
-
-<div class="error">
-
-<i class="fa-solid fa-circle-exclamation"></i>
-
-{{ error }}
-
-</div>
-
-{% endif %}
-
-{% if weather %}
-
-<!-- ===========================
-        HERO SECTION
-=========================== -->
-
-<section class="hero">
-
-    <!-- LEFT SIDE -->
-
-    <div class="hero-left">
-
-        <img
-            src="https://openweathermap.org/img/wn/{{ weather.icon }}@4x.png"
-            class="weather-img"
-            alt="Weather Icon">
-
-        <h1 class="temp">{{ weather.temp }}°C</h1>
-
-        <h2 class="city">
-            <i class="fa-solid fa-location-dot"></i>
-            {{ weather.city }}, {{ weather.country }}
-        </h2>
-
-        <p class="desc">
-            {{ weather.description }}
-        </p>
-
-        <div class="hero-stats">
-
-            <div class="stat">
-                <i class="fa-solid fa-temperature-half"></i>
-                <span>Feels Like</span>
-                <strong>{{ weather.feels_like }}°C</strong>
-            </div>
-
-            <div class="stat">
-                <i class="fa-solid fa-droplet"></i>
-                <span>Humidity</span>
-                <strong>{{ weather.humidity }}%</strong>
-            </div>
-
-            <div class="stat">
-                <i class="fa-solid fa-wind"></i>
-                <span>Wind</span>
-                <strong>{{ weather.wind }} m/s</strong>
-            </div>
-
-            <div class="stat">
-                <i class="fa-solid fa-cloud"></i>
-                <span>Clouds</span>
-                <strong>{{ weather.clouds }}%</strong>
-            </div>
-
-            <div class="stat">
-                <i class="fa-solid fa-eye"></i>
-                <span>Visibility</span>
-                <strong>{{ weather.visibility }} km</strong>
-            </div>
-
-            {% if aqi %}
-            <div class="stat">
-                <i class="fa-solid fa-leaf"></i>
-                <span>AQI</span>
-                <strong>{{ aqi }}</strong>
-            </div>
-            {% endif %}
-
-        </div>
-
-    </div>
-
-    <!-- RIGHT SIDE -->
-
-    <div class="hero-right">
-
-        <div class="chart-card">
-
-            <h3>
-
-                <i class="fa-solid fa-chart-line"></i>
-
-                Hourly Temperature
-
-            </h3>
-
-            <canvas id="tempChart"></canvas>
-
-        </div>
-
-    </div>
-
-</section>
-<!-- ===========================
-        WEATHER DETAILS
-=========================== -->
-
-<section class="details">
-
-<div class="box">
-    <i class="fa-solid fa-temperature-low"></i>
-    <h4>Min Temp</h4>
-    <p>{{ weather.temp_min }}°C</p>
-</div>
-
-<div class="box">
-    <i class="fa-solid fa-temperature-high"></i>
-    <h4>Max Temp</h4>
-    <p>{{ weather.temp_max }}°C</p>
-</div>
-
-<div class="box">
-    <i class="fa-solid fa-droplet"></i>
-    <h4>Humidity</h4>
-    <p>{{ weather.humidity }}%</p>
-</div>
-
-<div class="box">
-    <i class="fa-solid fa-wind"></i>
-    <h4>Wind</h4>
-    <p>{{ weather.wind }} m/s</p>
-</div>
-
-<div class="box">
-    <i class="fa-solid fa-eye"></i>
-    <h4>Visibility</h4>
-    <p>{{ weather.visibility }} km</p>
-</div>
-
-<div class="box">
-    <i class="fa-solid fa-cloud"></i>
-    <h4>Clouds</h4>
-    <p>{{ weather.clouds }}%</p>
-</div>
-
-<div class="box">
-    <i class="fa-solid fa-gauge-high"></i>
-    <h4>Pressure</h4>
-    <p>{{ weather.pressure }} hPa</p>
-</div>
-
-<div class="box">
-    <i class="fa-solid fa-sun"></i>
-    <h4>Sunrise</h4>
-    <p>{{ weather.sunrise }}</p>
-</div>
-
-<div class="box">
-    <i class="fa-solid fa-moon"></i>
-    <h4>Sunset</h4>
-    <p>{{ weather.sunset }}</p>
-</div>
-
-{% if aqi %}
-<div class="box">
-    <i class="fa-solid fa-leaf"></i>
-    <h4>Air Quality</h4>
-    <p>AQI {{ aqi }}</p>
-</div>
-{% endif %}
-
-</section>
-<!-- ===========================
-        5 DAY FORECAST
-=========================== -->
-
-<section class="forecast">
-
-    <div class="section-title">
-        <h2>
-            <i class="fa-solid fa-calendar-days"></i>
-            5 Day Forecast
-        </h2>
-    </div>
-
-    <div class="forecast-grid">
-
-        {% for day in forecast %}
-
-        <div class="forecast-card">
-
-            <h3>{{ day.day }}</h3>
-
-            <img
-                src="https://openweathermap.org/img/wn/{{ day.icon }}@2x.png"
-                alt="{{ day.desc }}">
-
-            <h2>{{ day.temp }}°</h2>
-
-            <p>{{ day.desc }}</p>
-
-        </div>
-
-        {% endfor %}
-
-    </div>
-
-</section>
-
-<!-- ===========================
-        WEATHER HIGHLIGHTS
-=========================== -->
-
-<section class="highlights">
-
-    <div class="section-title">
-        <h2>
-            <i class="fa-solid fa-star"></i>
-            Today's Highlights
-        </h2>
-    </div>
-
-    <div class="highlight-grid">
-
-        <div class="highlight-card">
-            <i class="fa-solid fa-temperature-half"></i>
-            <h4>Feels Like</h4>
-            <h2>{{ weather.feels_like }}°C</h2>
-        </div>
-
-        <div class="highlight-card">
-            <i class="fa-solid fa-droplet"></i>
-            <h4>Humidity</h4>
-            <h2>{{ weather.humidity }}%</h2>
-        </div>
-
-        <div class="highlight-card">
-            <i class="fa-solid fa-eye"></i>
-            <h4>Visibility</h4>
-            <h2>{{ weather.visibility }} km</h2>
-        </div>
-
-        <div class="highlight-card">
-            <i class="fa-solid fa-cloud"></i>
-            <h4>Clouds</h4>
-            <h2>{{ weather.clouds }}%</h2>
-        </div>
-
-    </div>
-
-</section>
-
-<!-- ===========================
-        FOOTER
-=========================== -->
-
-<footer class="footer">
-
-<div class="footer-left">
-
-<i class="fa-solid fa-cloud-sun"></i>
-
-Weather Dashboard Pro
-
-</div>
-
-<div class="footer-right">
-
-Flask • OpenWeather API • Chart.js
-
-</div>
-
-</footer>
-{% endif %}
-
-</div>
-
-</div>
-
-{% if hourly %}
-
-<script>
-
-const hourlyLabels = {{ hourly | map(attribute='time') | list | tojson | safe }};
-
-const hourlyTemps = {{ hourly | map(attribute='temp') | list | tojson | safe }};
-
-</script>
-
-{% endif %}
-
-<script src="{{ url_for('static', filename='script.js') }}"></script>
-
-<script src="{{ url_for('static', filename='darkmode.js') }}"></script>
-
+<body class="{{ weather.main|lower if weather else '' }}">
+  <div class="background" aria-hidden="true">
+    <span class="orb orb-one"></span><span class="orb orb-two"></span><span class="grid-glow"></span>
+    <span class="scene-sun"></span><span class="scene-moon"></span><span class="scene-rain"></span>
+  </div>
+
+  <main class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Atmos home"><span class="brand-mark"><i class="fa-solid fa-cloud-sun"></i></span><span>atmos</span></a>
+      <div class="header-actions">
+        <time id="liveClock" data-timezone="{{ weather.timezone_offset if weather else '' }}" aria-label="Current local time"></time>
+        <button id="themeToggle" class="icon-button" type="button" aria-label="Switch to dark theme"><i class="fa-solid fa-moon"></i></button>
+      </div>
+    </header>
+
+    <section class="search-panel" aria-labelledby="welcome-title">
+      <div class="search-copy">
+        <p class="eyebrow"><span></span> Weather, beautifully clear</p>
+        <p id="welcome-title" class="lede">Search a city or use your location for precise conditions, air quality, and the days ahead.</p>
+      </div>
+      <form action="/" method="post" class="search-form" data-city="{{ weather.city if weather else '' }}">
+        <label class="sr-only" for="city">City name</label>
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input id="city" name="city" type="text" placeholder="Search city" value="{{ request.form.get('city', '') }}" autocomplete="off" required>
+        <button class="search-button" type="submit">Search <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+        <button id="locationBtn" class="location-button" type="button" aria-label="Use my current location" title="Use my location"><i class="fa-solid fa-location-arrow"></i></button>
+      </form>
+      <div id="recentSearches" class="recent-searches" aria-label="Recently searched cities" hidden></div>
+    </section>
+
+    {% if error %}<div class="alert" role="alert"><i class="fa-solid fa-circle-exclamation"></i>{{ error }}</div>{% endif %}
+
+    {% if weather %}
+    <section class="current-weather" aria-labelledby="location-name">
+      <div class="current-summary">
+        <div class="location-line"><i class="fa-solid fa-location-dot"></i><span id="location-name">{{ weather.city }}, {{ weather.country }}</span></div>
+        <div class="temperature-row"><img src="https://openweathermap.org/img/wn/{{ weather.icon }}@4x.png" alt="{{ weather.description }}" class="weather-icon"><div><div class="temperature">{{ weather.temp }}<sup>&deg;</sup></div><p class="condition">{{ weather.description }}</p></div></div>
+        <p class="range">Feels like <strong>{{ weather.feels_like }}&deg;</strong> &nbsp;·&nbsp; Today: <strong>{{ weather.temp_min }}&deg; / {{ weather.temp_max }}&deg;</strong></p>
+      </div>
+      <div class="summary-stats" aria-label="Current conditions">
+        <div><i class="fa-solid fa-droplet"></i><span>Humidity</span><strong>{{ weather.humidity }}%</strong></div>
+        <div><i class="fa-solid fa-wind"></i><span>Wind</span><strong>{{ weather.wind }} m/s</strong></div>
+        <div><i class="fa-solid fa-eye"></i><span>Visibility</span><strong>{{ weather.visibility }} km</strong></div>
+        {% if aqi %}<div><i class="fa-solid fa-leaf"></i><span>Air quality</span><strong>AQI {{ aqi }}</strong></div>{% endif %}
+      </div>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="panel chart-panel"><div class="panel-heading"><div><p class="eyebrow">Next 24 hours</p><h2>Temperature trend</h2></div><span class="pill"><i class="fa-solid fa-chart-line"></i> Live forecast</span></div><div class="chart-wrap"><canvas id="tempChart" aria-label="Hourly temperature chart"></canvas></div></article>
+      <article class="panel sun-panel"><div class="panel-heading"><div><p class="eyebrow">Daylight</p><h2>Sun schedule</h2></div></div><div class="sun-times"><div><i class="fa-solid fa-sun"></i><span>Sunrise</span><strong>{{ weather.sunrise }}</strong></div><div class="sun-path"><span></span></div><div><i class="fa-solid fa-moon"></i><span>Sunset</span><strong>{{ weather.sunset }}</strong></div></div></article>
+    </section>
+
+    <section class="section-block" aria-labelledby="forecast-heading"><div class="section-heading"><div><p class="eyebrow">The week ahead</p><h2 id="forecast-heading">5-day forecast</h2></div></div><div class="forecast-grid">{% for day in forecast %}<article class="forecast-card"><h3>{{ day.day }}</h3><img src="https://openweathermap.org/img/wn/{{ day.icon }}@2x.png" alt="{{ day.desc }}"><strong>{{ day.temp }}&deg;</strong><p>{{ day.desc }}</p></article>{% endfor %}</div></section>
+
+    <section class="section-block" aria-labelledby="details-heading"><div class="section-heading"><div><p class="eyebrow">At this moment</p><h2 id="details-heading">Weather details</h2></div></div><div class="details-grid">
+      <article class="detail-card"><i class="fa-solid fa-temperature-half"></i><span>Feels like</span><strong>{{ weather.feels_like }}&deg;</strong></article>
+      <article class="detail-card"><i class="fa-solid fa-cloud"></i><span>Cloud cover</span><strong>{{ weather.clouds }}%</strong></article>
+      <article class="detail-card"><i class="fa-solid fa-gauge-high"></i><span>Pressure</span><strong>{{ weather.pressure }} hPa</strong></article>
+      <article class="detail-card"><i class="fa-solid fa-temperature-arrow-up"></i><span>High today</span><strong>{{ weather.temp_max }}&deg;</strong></article>
+    </div></section>
+    {% else %}
+    <section class="empty-state"><div class="empty-icon"><i class="fa-solid fa-cloud-sun"></i></div><div><p class="eyebrow">Ready when you are</p><h2>Find the forecast for any city.</h2><p>Get a detailed look at current conditions, hourly temperature, and the five-day outlook.</p></div></section>
+    {% endif %}
+    <footer><span>Powered by OpenWeather</span><span>Built with Flask</span></footer>
+  </main>
+  {% if hourly %}<script>const hourlyLabels = {{ hourly | map(attribute='time') | list | tojson }}; const hourlyTemps = {{ hourly | map(attribute='temp') | list | tojson }};</script>{% endif %}
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
-
 </html>
