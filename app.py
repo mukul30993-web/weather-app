@@ -110,18 +110,45 @@ def home():
         city = request.form.get("city", "").strip()
         if city:
             try:
-                return render_template("index.html", **page_context(get_current_weather(city=city)))
+                # Get weather data
+                weather_data = get_current_weather(city=city)
+
+                # Send weather data to n8n
+                requests.post(
+                    "http://localhost:5678/webhook-test/weather",
+                    json={
+                        "city": weather_data["city"],
+                        "country": weather_data["country"],
+                        "temperature": weather_data["temp"],
+                        "feels_like": weather_data["feels_like"],
+                        "humidity": weather_data["humidity"],
+                        "description": weather_data["description"]
+                    },
+                    timeout=5
+                )
+
+                # Show weather on the website
+                return render_template(
+                    "index.html",
+                    **page_context(weather_data)
+                )
+
             except requests.exceptions.HTTPError:
                 return render_template("index.html", **page_context(error="City not found. Try another search."))
+
             except requests.exceptions.ConnectionError:
                 return render_template("index.html", **page_context(error="No internet connection."))
+
             except requests.exceptions.Timeout:
                 return render_template("index.html", **page_context(error="The weather request timed out. Please try again."))
+
             except RuntimeError as error:
                 return render_template("index.html", **page_context(error=str(error)))
+
             except Exception:
                 app.logger.exception("Weather request failed")
                 return render_template("index.html", **page_context(error="Something went wrong. Please try again."))
+
     return render_template("index.html", **page_context())
 
 
