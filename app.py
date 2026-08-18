@@ -9,10 +9,10 @@ load_dotenv()
 
 app = Flask(__name__)
 API_KEY = os.getenv("OPENWEATHER_API_KEY")
-
 CURRENT_URL = "https://api.openweathermap.org/data/2.5/weather"
 FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast"
 AIR_URL = "https://api.openweathermap.org/data/2.5/air_pollution"
+N8N_WEBHOOK_URL = "http://localhost:5678/webhook-test/weather"
 session = requests.Session()
 
 
@@ -96,6 +96,25 @@ def get_air_quality(lat, lon):
         return None
 
 
+def send_to_n8n(weather_data):
+    """Fire-and-forget notification to n8n. Never let this break the page."""
+    try:
+        requests.post(
+            N8N_WEBHOOK_URL,
+            json={
+                "city": weather_data["city"],
+                "country": weather_data["country"],
+                "temperature": weather_data["temp"],
+                "feels_like": weather_data["feels_like"],
+                "humidity": weather_data["humidity"],
+                "description": weather_data["description"],
+            },
+            timeout=5,
+        )
+    except requests.exceptions.RequestException:
+        app.logger.warning("n8n webhook failed; continuing without it", exc_info=True)
+
+
 def page_context(weather=None, error=None):
     hourly, forecast, aqi = [], [], None
     if weather:
@@ -110,28 +129,13 @@ def home():
         city = request.form.get("city", "").strip()
         if city:
             try:
-                # Get weather data
                 weather_data = get_current_weather(city=city)
+                context = page_context(weather_data)
 
-                # Send weather data to n8n
-                requests.post(
-                    "http://localhost:5678/webhook-test/weather",
-                    json={
-                        "city": weather_data["city"],
-                        "country": weather_data["country"],
-                        "temperature": weather_data["temp"],
-                        "feels_like": weather_data["feels_like"],
-                        "humidity": weather_data["humidity"],
-                        "description": weather_data["description"]
-                    },
-                    timeout=5
-                )
+                # Notify n8n — isolated so a webhook failure never breaks the page
+                send_to_n8n(weather_data)
 
-                # Show weather on the website
-                return render_template(
-                    "index.html",
-                    **page_context(weather_data)
-                )
+                return render_template("index.html", **context)
 
             except requests.exceptions.HTTPError:
                 return render_template("index.html", **page_context(error="City not found. Try another search."))
@@ -158,7 +162,8 @@ def location():
     if not lat or not lon:
         return render_template("index.html", **page_context(error="Location coordinates are missing.")), 400
     try:
-        return render_template("index.html", **page_context(get_current_weather(lat=lat, lon=lon)))
+        weather_data = get_current_weather(lat=lat, lon=lon)
+        return render_template("index.html", **page_context(weather_data))
     except Exception:
         app.logger.exception("Location weather request failed")
         return render_template("index.html", **page_context(error="Unable to fetch weather for your location."))

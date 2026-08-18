@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b1220">
+  <meta name="color-scheme" content="light">
   <title>Atmos | Weather dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,6 +47,7 @@
 
     {% if weather %}
     <section class="current-weather" aria-labelledby="location-name">
+      <div class="weather-glow" aria-hidden="true"></div>
       <div class="current-summary">
         <div class="location-line"><i class="fa-solid fa-location-dot"></i><span id="location-name">{{ weather.city }}, {{ weather.country }}</span></div>
         <div class="temperature-row"><img src="https://openweathermap.org/img/wn/{{ weather.icon }}@4x.png" alt="{{ weather.description }}" class="weather-icon"><div><div class="temperature">{{ weather.temp }}<sup>&deg;</sup></div><p class="condition">{{ weather.description }}</p></div></div>
